@@ -1,0 +1,15 @@
+# data (provided separately by HackerEarth — do not commit/redistribute)
+data/*.csv
+
+# generated outputs
+outputs/*.csv
+
+# python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# env
+.venv/
+venv/
+.env

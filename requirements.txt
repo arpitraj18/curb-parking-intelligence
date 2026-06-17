@@ -1,0 +1,8 @@
+# core pipeline
+pandas>=2.0
+numpy>=1.24
+scikit-learn>=1.3
+# notebook + visualisation
+matplotlib>=3.7
+folium>=0.15
+jupyter>=1.0
