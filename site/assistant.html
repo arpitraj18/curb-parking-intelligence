@@ -12,11 +12,91 @@
 <div id="curb-header"></div>
 
 <div class="page">
-
+  <style>
+    .welcome-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 10px 20px 10px;
+      margin: auto 0;
+    }
+    .welcome-state .icon-circle {
+      width: 38px;
+      height: 38px;
+      background: var(--surface);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+      color: var(--amber-strong);
+    }
+    .welcome-state .icon-circle .material-symbols-outlined {
+      font-size: 20px;
+    }
+    .welcome-state h1 {
+      font-family: "Geist", sans-serif;
+      font-size: 24px;
+      font-weight: 500;
+      margin: 0 0 6px;
+      letter-spacing: -0.02em;
+    }
+    .welcome-state p {
+      font-size: 13px;
+      color: var(--muted);
+      max-width: 460px;
+      line-height: 1.4;
+      margin: 0 0 16px;
+    }
+    .sugg-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      width: 100%;
+      text-align: left;
+    }
+    .sugg-card {
+      background: var(--surface);
+      border: 1px solid transparent;
+      border-radius: 12px;
+      padding: 10px 14px;
+      cursor: pointer;
+      transition: all .2s var(--ease);
+    }
+    .sugg-card:hover {
+      border-color: var(--amber-strong);
+      background: var(--raised);
+    }
+    .sugg-card .sl {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 10px;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    .sugg-card .st {
+      font-size: 13px;
+      color: var(--text);
+      line-height: 1.4;
+    }
+    @media (max-width: 640px) {
+      .sugg-grid { grid-template-columns: 1fr; }
+    }
+  </style>
   <div class="chatwrap">
-    <div class="msgs" id="msgs"></div>
-    <div class="sugg-label" id="suggLabel">Try asking:</div>
-    <div class="sugg" id="sugg"></div>
+    <div class="msgs" id="msgs">
+      <div id="welcome" class="welcome-state fade-in">
+        <div class="icon-circle">
+          <span class="material-symbols-outlined">auto_awesome</span>
+        </div>
+        <h1 id="greeting">Good Afternoon, Admin.</h1>
+        <p>Analyze real-time traffic anomalies, dispatch units, or query historic hotspot data through our intelligent neural core.</p>
+        <div class="sugg-grid" id="suggGrid"></div>
+      </div>
+    </div>
     <div class="askbar">
       <input id="q" placeholder="e.g. top delivery hotspots, or chronic safety spots near HSR" autocomplete="off">
       <button id="send">Ask</button>
@@ -31,23 +111,38 @@
 (function(){
   var X=window.CURBX;
   var msgs=document.getElementById("msgs"), input=document.getElementById("q");
-  var suggEl=document.getElementById("sugg"), suggLabel=document.getElementById("suggLabel");
-  var SUGG=["Top 5 delivery hotspots","Chronic safety spots","Emerging commuter spots","Worst 5 overall"];
+  var suggGrid=document.getElementById("suggGrid"), welcome=document.getElementById("welcome");
   var asked=false;
 
-  // Render suggestions immediately so they're visible before any question
-  suggEl.innerHTML=SUGG.map(function(s){return '<span class="s">'+s+'</span>';}).join("");
-  suggEl.querySelectorAll(".s").forEach(function(s){s.onclick=function(){ask(s.textContent);};});
+  // Set dynamic greeting based on time of day
+  var hour = new Date().getHours();
+  var greetingText = hour < 12 ? "Good Morning" : hour < 18 ? "Good Afternoon" : "Good Evening";
+  document.getElementById("greeting").textContent = greetingText + ", Admin.";
 
-  function hideSugg(){
-    if(!asked){ asked=true; suggEl.style.display="none"; suggLabel.style.display="none"; }
+  var SUGG_CARDS = [
+    { label: "Real-Time Analysis", text: "Show me the top 5 delivery hotspots in the central business district right now." },
+    { label: "History & Trends", text: "How does current congestion at MG Road compare to last Friday's monsoon peak?" },
+    { label: "Optimization", text: "Find the most efficient dispatch path for Unit 402 to reach the Indiranagar clog." },
+    { label: "Reporting", text: "Generate a summary of recurring chronic hotspots within 2km of Whitefield." }
+  ];
+
+  suggGrid.innerHTML = SUGG_CARDS.map(function(c){
+    return '<div class="sugg-card"><div class="sl">' + X.esc(c.label) + '</div><div class="st">"' + X.esc(c.text) + '"</div></div>';
+  }).join("");
+
+  suggGrid.querySelectorAll(".sugg-card").forEach(function(card, i){
+    card.onclick = function() { ask(SUGG_CARDS[i].text); };
+  });
+
+  function hideWelcome(){
+    if(!asked){ asked=true; welcome.style.display="none"; }
   }
 
   function bubble(who,html,noScroll){
     var d=document.createElement("div"); d.className="msg "+who+" fade-in";
     d.innerHTML='<div class="av">'+(who==="bot"?"AI":"You")+'</div><div class="body">'+html+'</div>';
     msgs.appendChild(d);
-    if(!noScroll) msgs.scrollTop = msgs.scrollHeight;
+    if(!noScroll) window.scrollTo(0, document.body.scrollHeight);
     return d;
   }
   function go(rank){document.body.classList.remove("curb-ready");setTimeout(function(){location.href="map.html?focus="+rank;},200);}
@@ -79,10 +174,8 @@
     renderResults(node, answer, res);
   }
 
-  bubble("bot","I read CURB's priority list. Ask where to focus — by cause (delivery, safety, commuter, hire), by area, by trend, or just the worst spots. Every number comes straight from the data.", true);
-
   function ask(text){
-    var q=(text||input.value).trim(); if(!q)return; input.value=""; hideSugg();
+    var q=(text||input.value).trim(); if(!q)return; input.value=""; hideWelcome();
     bubble("me",X.esc(q));
     var typing=bubble("bot",'<span class="typing"><span></span><span></span><span></span></span>');
 
