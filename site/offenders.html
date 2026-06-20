@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CURB — Offenders</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Geist:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/curb.css">
+</head>
+<body data-page="offenders">
+<div id="curb-header"></div>
+
+<div class="page page-wide">
+
+
+  <div class="tabs">
+    <div class="tab on" data-tab="vehicles">Vehicles</div>
+    <div class="tab" data-tab="locations">Locations</div>
+  </div>
+
+  <div id="vehicles" class="fade-in">
+    <div class="tiles" style="grid-template-columns:repeat(3,1fr);margin-bottom:22px" id="patSplit"></div>
+    <table class="dtable">
+      <thead><tr><th>Vehicle ID</th><th class="num">Citations</th><th>Pattern</th><th>Top location</th><th class="num">Share there</th><th class="num">Span</th><th>Type</th></tr></thead>
+      <tbody id="vrows"></tbody>
+    </table>
+    <p class="caveat">Repeat <b>detections</b>, not proven offences — a vehicle caught often may park where enforcement is heavy. IDs are anonymized: aggregate targeting, never owner identification.</p>
+  </div>
+
+  <div id="locations" style="display:none">
+    <div class="tiles" style="grid-template-columns:repeat(2,1fr);margin-bottom:22px" id="locSplit"></div>
+    <table class="dtable">
+      <thead><tr><th>Location</th><th class="num">Citations</th><th class="num">Distinct vehicles</th><th class="num">Repeat vehicles</th><th class="num">Repeat share</th><th>Recidivism</th></tr></thead>
+      <tbody id="lrows"></tbody>
+    </table>
+    <p class="caveat">A <b>Habitual</b> location (high repeat-share, few distinct vehicles) argues for a structural fix — designated/permit parking. A <b>Transient</b> spot argues for enforcement presence.</p>
+  </div>
+</div>
+
+<script src="assets/curb-data.js"></script>
+<script src="assets/curb-app.js"></script>
+<script src="assets/curb-nav.js"></script>
+<script>
+(function(){
+  var D=window.CURB, X=window.CURBX, O=D.offenders;
+  var patColor={"Habitual (one spot)":"#E5564B","Roaming (many spots)":"#5AA0E6","Repeat":"#B6A892"};
+
+  document.getElementById("patSplit").innerHTML=Object.keys(D.agg.offender_pattern).map(function(k){
+    return '<div class="tile"><div class="v" style="font-size:26px;color:'+(patColor[k]||"var(--text)")+'">'+D.agg.offender_pattern[k]+'</div><div class="k">'+X.esc(k)+'</div></div>';
+  }).join("");
+
+  document.getElementById("vrows").innerHTML=O.vehicles.map(function(v){
+    var pc=patColor[v.pattern]||"var(--dim)";
+    return '<tr>'+
+      '<td class="mono" style="color:var(--amber)">'+X.esc(v.vehicle_id)+'</td>'+
+      '<td class="num mono">'+v.violations+'</td>'+
+      '<td><span class="badge" style="margin:0;color:'+pc+';border-color:'+pc+'66">'+X.esc(v.pattern)+'</span></td>'+
+      '<td>'+X.esc(X.cleanName(v.top_location))+'</td>'+
+      '<td class="num"><span class="mono">'+Math.round(v.top_location_share*100)+'%</span> '+
+        '<span class="bar" style="width:60px"><span style="width:'+(v.top_location_share*100)+'%;background:'+pc+'"></span></span></td>'+
+      '<td class="num mono">'+v.span_days+'d</td>'+
+      '<td style="color:var(--muted)">'+X.esc(v.vehicle_type)+'</td>'+
+    '</tr>';
+  }).join("");
+
+  document.getElementById("locSplit").innerHTML=[["Habitual","#E5564B"],["Mixed","#F0A93B"]].map(function(p){
+    return '<div class="tile"><div class="v" style="font-size:26px;color:'+p[1]+'">'+(D.agg.loc_recidivism[p[0]]||0)+'</div><div class="k">'+p[0]+' locations</div></div>';
+  }).join("");
+
+  document.getElementById("lrows").innerHTML=O.locations.map(function(l){
+    return '<tr>'+
+      '<td>'+X.esc(X.cleanName(l.name))+'</td>'+
+      '<td class="num mono">'+l.violations+'</td>'+
+      '<td class="num mono">'+l.distinct_vehicles+'</td>'+
+      '<td class="num mono">'+l.repeat_vehicles+'</td>'+
+      '<td class="num"><span class="mono">'+Math.round(l.repeat_share*100)+'%</span> '+
+        '<span class="bar" style="width:60px"><span style="width:'+(l.repeat_share*100)+'%;background:#E5564B"></span></span></td>'+
+      '<td><span class="badge '+l.recidivism+'" style="margin:0">'+l.recidivism+'</span></td>'+
+    '</tr>';
+  }).join("");
+
+  document.querySelectorAll(".tab").forEach(function(t){
+    t.onclick=function(){
+      document.querySelectorAll(".tab").forEach(function(x){x.classList.remove("on");});
+      t.classList.add("on");
+      var sel=t.dataset.tab;
+      ["vehicles","locations"].forEach(function(id){
+        var el=document.getElementById(id);
+        if(id===sel){el.style.display="";el.classList.remove("fade-in");void el.offsetWidth;el.classList.add("fade-in");}
+        else el.style.display="none";
+      });
+    };
+  });
+})();
+</script>
+</body></html>

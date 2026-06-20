@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CURB — Methodology</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Geist:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/curb.css">
+<style>
+  .doc{max-width:760px}
+  .doc p{color:var(--muted);line-height:1.7;margin:0 0 14px}
+  .doc .formula{font-family:"JetBrains Mono",monospace;background:var(--surface);border:1px solid var(--hairline-soft);
+    padding:12px 14px;color:var(--text);font-size:13px;margin:6px 0 18px}
+  .doc b{color:var(--text)}
+</style>
+</head>
+<body data-page="methodology">
+<div id="curb-header"></div>
+
+<div class="page doc">
+
+  <p>Every figure in CURB traces to the single provided enforcement dataset. No external data, no scraping, no invented ground truth. Where a number is an index rather than a measurement, we say so.</p>
+
+  <h2 class="section-h">How we rank — the obstruction-impact index</h2>
+  <p>Each violation is scored by <b>severity</b> (where it happens — main road, footpath, bus stop) times the <b>vehicle footprint</b> (road space a vehicle type occupies, in passenger-car units). Summed onto a ~55 m grid, this gives each spot an impact index.</p>
+  <div class="formula">cell_impact = Σ ( severity × vehicle_footprint )  →  normalised to 0–100</div>
+  <p>It is a <b>prioritisation index</b>, not measured or predicted traffic. A spot scoring 100 carries the most obstruction burden in the data — it is not "100% congested."</p>
+
+  <h2 class="section-h">Root cause &amp; prescription</h2>
+  <p>The vehicle mix at a spot implies its cause: heavy goods → a <b>delivery</b> problem (loading bay); two-wheeler dominance → <b>commuter</b> overflow (park-and-ride); autos → <b>hire/transit</b> demand (stand); safety-critical locations → <b>safety</b> risk (bollards). Each cause maps to a differentiated fix rather than a generic "send a patrol."</p>
+
+  <h2 class="section-h">Persistence</h2>
+  <p>Spots are tiered by how many distinct days they recur: <b>Chronic</b> (standing posts), <b>Frequent</b>, <b>Occasional</b>. This separates a permanent problem from an occasional one.</p>
+
+  <h2 class="section-h">Trends</h2>
+  <p>Citywide volume is flat across the window (second/first-half ratio ≈ 1.01), so a spot rising faster than the city is genuinely <b>emerging</b>. This is a <b>retrospective</b> trend over ~5 months — not a forecast. Hour-of-day is unreliable in this dataset and is not used; only day/week granularity is.</p>
+
+  <h2 class="section-h">Repeat offenders</h2>
+  <p>These are repeat <b>detections</b>, not proven offences — a vehicle caught often may simply park where enforcement is heavy. Vehicle IDs are anonymised: aggregate targeting, never owner identification. A location where the <b>same</b> vehicles return points to a structural fix; many different vehicles points to enforcement presence.</p>
+
+  <h2 class="section-h">Data &amp; compliance</h2>
+  <p>Provided dataset only. The assistant's language model <b>phrases</b> results already computed from that data — it never adds outside facts, retrieves, or browses. Severity and footprint weights are transparent, self-defined constants (a formula, not external data) and are listed in the source repository.</p>
+</div>
+
+<script src="assets/curb-data.js"></script>
+<script src="assets/curb-app.js"></script>
+<script src="assets/curb-nav.js"></script>
+</body></html>

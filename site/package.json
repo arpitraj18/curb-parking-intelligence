@@ -1,0 +1,7 @@
+{
+  "name": "curb-operational-intelligence",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CURB — parking-congestion intelligence console (Bengaluru Traffic Police).",
+  "engines": { "node": ">=18" }
+}

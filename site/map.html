@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CURB — Map</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Geist:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="assets/curb.css">
+  <style>
+    body[data-page="map"] {
+      overflow: hidden
+    }
+
+    /* map fills the entire page */
+    .map-stage {
+      position: fixed;
+      inset: 0;
+      z-index: 1
+    }
+
+    #map {
+      position: absolute;
+      inset: 0;
+      background: #e8e8e6
+    }
+
+    /* push leaflet zoom controls below the floating nav */
+    .leaflet-top.leaflet-left {
+      margin-top: calc(var(--head-h, 88px) + 22px);
+      margin-left: 14px
+    }
+
+    .leaflet-control-zoom a {
+      background: var(--surface) !important;
+      color: var(--text) !important;
+      border-color: var(--hairline) !important
+    }
+
+    .leaflet-control-attribution {
+      background: rgba(255, 255, 255, .78) !important;
+      color: #555 !important;
+      font-size: 9px
+    }
+
+    /* collapsible docks that emerge from below */
+    .dock {
+      position: fixed;
+      bottom: 0;
+      z-index: 600;
+      background: rgba(22, 17, 10, .86);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--hairline);
+      border-bottom: none;
+      border-radius: 14px 14px 0 0;
+      box-shadow: 0 -10px 34px rgba(0, 0, 0, .3);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden
+    }
+
+    .dock-left {
+      left: 16px;
+      width: 400px;
+      max-width: calc(100vw - 32px)
+    }
+
+    .dock-right {
+      right: 16px;
+      width: 248px
+    }
+
+    .dock-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 15px;
+      cursor: pointer;
+      flex: none;
+      user-select: none
+    }
+
+    .dock-head .t {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 10px;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--amber);
+      display: flex;
+      align-items: center;
+      gap: 8px
+    }
+
+    .dock-head .t .d {
+      width: 7px;
+      height: 7px;
+      border-radius: 1px;
+      background: var(--amber-strong)
+    }
+
+    .dock-head .chev {
+      color: var(--dim);
+      font-size: 20px;
+      transition: transform .3s var(--ease)
+    }
+
+    .dock.collapsed .dock-head .chev {
+      transform: rotate(180deg)
+    }
+
+    .dock-head .teaser {
+      font-size: 11px;
+      color: var(--muted);
+      flex: 1;
+      text-align: right;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      display: none
+    }
+
+    .dock.collapsed .dock-head .teaser {
+      display: block
+    }
+
+    .dock-body {
+      max-height: 62vh;
+      overflow-y: auto;
+      transition: max-height .32s var(--ease), opacity .25s var(--ease);
+      padding: 0 15px 15px
+    }
+
+    .dock.collapsed .dock-body {
+      max-height: 0;
+      opacity: 0;
+      padding-top: 0;
+      padding-bottom: 0
+    }
+
+    /* priority callout inside the left dock */
+    .sel-name {
+      font-family: "Archivo", sans-serif;
+      font-weight: 700;
+      font-size: 22px;
+      line-height: 1.1;
+      margin: 2px 0 4px
+    }
+
+    .sel-desc {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 3px
+    }
+
+    .sel-fix {
+      font-size: 12px;
+      color: var(--amber);
+      margin-bottom: 12px
+    }
+
+    .mini-eye {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 9px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--dim);
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin: 4px 0 8px
+    }
+
+    .mini-eye .d {
+      width: 7px;
+      height: 7px;
+      border-radius: 1px;
+      background: var(--amber-strong)
+    }
+
+    .tl-row {
+      display: grid;
+      grid-template-columns: 20px 1fr auto;
+      gap: 9px;
+      align-items: center;
+      padding: 6px 4px;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background .14s var(--ease)
+    }
+
+    .tl-row:hover {
+      background: rgba(255, 255, 255, .05)
+    }
+
+    .tl-row .r {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 11px;
+      color: var(--dim)
+    }
+
+    .tl-row .n {
+      font-size: 12px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap
+    }
+
+    .tl-row .n .pd {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 7px
+    }
+
+    .tl-row .i {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 13px
+    }
+
+    .search {
+      margin: 2px 0 11px
+    }
+
+    .chips .chip {
+      font-size: 10px;
+      padding: 4px 9px
+    }
+
+    /* metrics in the right dock */
+    .metric {
+      margin-bottom: 13px
+    }
+
+    .metric:last-child {
+      margin-bottom: 2px
+    }
+
+    .metric .mk {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 9px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--dim)
+    }
+
+    .metric .mv {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 25px;
+      font-weight: 500;
+      line-height: 1.1
+    }
+
+    .metric .mv.amber {
+      color: var(--amber-strong)
+    }
+
+    .metric .mv .u {
+      font-size: 13px;
+      color: var(--muted)
+    }
+
+    .leaflet-popup-content-wrapper {
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--hairline);
+      border-radius: 0
+    }
+
+    .leaflet-popup-tip {
+      background: var(--surface)
+    }
+
+    .leaflet-popup-content {
+      margin: 11px 13px
+    }
+
+    .pop h3 {
+      margin: 0 0 6px;
+      font-size: 13px;
+      font-family: "Archivo", sans-serif
+    }
+
+    .pop .pc {
+      font-size: 11px;
+      margin: 2px 0
+    }
+
+    .pop .pk {
+      color: var(--dim)
+    }
+
+    @media (max-width:900px) {
+      .dock-right {
+        display: none
+      }
+
+      .dock-left {
+        width: auto;
+        right: 16px
+      }
+    }
+  </style>
+</head>
+
+<body data-page="map">
+  <div id="curb-header"></div>
+
+  <div class="map-stage">
+    <div id="map"></div>
+  </div>
+
+  <!-- priorities: collapsible, emerges from below (left) -->
+  <div class="dock dock-left" id="dockL">
+    <div class="dock-head" id="headL">
+      <span class="t"><span class="d"></span>Priority Dispatch</span>
+      <span class="teaser" id="teaserL"></span>
+      <span class="material-symbols-outlined chev">expand_more</span>
+    </div>
+    <div class="dock-body">
+      <input class="search" id="search" placeholder="Search a junction or area…">
+      <div class="mini-eye"><span class="d"></span>Filter by root cause</div>
+      <div class="chips" id="causeChips"></div>
+      <div class="mini-eye" style="margin-top:11px"><span class="d" style="background:var(--dim)"></span>Selected
+        hotspot</div>
+      <h2 class="sel-name" id="selName">—</h2>
+      <div class="sel-desc" id="selDesc"></div>
+      <div class="sel-fix" id="selFix"></div>
+      <div class="mini-eye"><span class="d"></span><span id="topLabel">Top priorities</span></div>
+      <div id="topList"></div>
+    </div>
+  </div>
+
+  <!-- metrics: collapsible, emerges from below (right) -->
+  <div class="dock dock-right" id="dockR">
+    <div class="dock-head" id="headR">
+      <span class="t"><span class="d"></span>Live Metrics</span>
+      <span class="material-symbols-outlined chev">expand_more</span>
+    </div>
+    <div class="dock-body" id="metrics"></div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="assets/curb-data.js"></script>
+  <script src="assets/curb-app.js"></script>
+  <script src="assets/curb-nav.js"></script>
+  <script>
+    (function () {
+      var D = window.CURB, X = window.CURBX;
+      var causes = Object.keys(X.CAUSE), fCause = [], q = "", selected = null, markers = {};
+
+      var TILES = {
+        dark:  "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+        light: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+      };
+      var TILE_OPTS = { subdomains: "abcd", maxZoom: 20, attribution: "© OpenStreetMap © CARTO" };
+
+      var map = L.map("map", { zoomControl: true, renderer: L.svg() }).setView([12.97, 77.59], 11.4);
+      var initTheme = (localStorage.getItem("curb-theme") || "dark");
+      var tileLayer = L.tileLayer(TILES[initTheme], TILE_OPTS).addTo(map);
+
+      // Swap tile layer when the global theme changes
+      document.addEventListener("curb:theme", function (e) {
+        var t = e.detail.theme;
+        map.removeLayer(tileLayer);
+        tileLayer = L.tileLayer(TILES[t] || TILES.dark, TILE_OPTS).addTo(map);
+      });
+
+      // metrics (real)
+      var cov50 = (D.agg.coverage.filter(function (c) { return c.n === 50; })[0] || {}).pct;
+      document.getElementById("metrics").innerHTML = [
+        { k: "Hotspots ranked", v: D.meta.hotspot_count.toLocaleString() },
+        { k: "Chronic standing posts", v: D.agg.chronic },
+        { k: "Top-50 impact coverage", v: cov50 + '<span class="u">%</span>' },
+        { k: "High-conviction spots", v: D.meta.high_conviction, amber: true }
+      ].map(function (m) { return '<div class="metric"><div class="mk">' + m.k + '</div><div class="mv' + (m.amber ? ' amber' : '') + '">' + m.v + '</div></div>'; }).join("");
+
+      // cause chips
+      function renderChips() {
+        document.getElementById("causeChips").innerHTML = causes.map(function (c) {
+          var on = fCause.indexOf(c) >= 0, hex = X.causeHex(c);
+          return '<span class="chip' + (on ? ' on' : '') + '" data-v="' + c + '"' + (on ? ' style="border-color:' + hex + '99;background:' + hex + '22"' : '') +
+            '><span class="dot" style="background:' + hex + '"></span>' + X.esc(c) + '</span>';
+        }).join("");
+        document.getElementById("causeChips").querySelectorAll(".chip").forEach(function (el) {
+          el.onclick = function () { var v = el.dataset.v, i = fCause.indexOf(v); if (i >= 0) fCause.splice(i, 1); else fCause.push(v); renderChips(); render(); };
+        });
+      }
+      function visible() {
+        return D.hotspots.filter(function (h) {
+          if (fCause.length && fCause.indexOf(h.root_cause) < 0) return false;
+          if (q && (h.name || "").toLowerCase().indexOf(q.toLowerCase()) < 0) return false;
+          return true;
+        });
+      }
+      function popup(h) {
+        var hex = X.causeHex(h.root_cause);
+        return '<div class="pop"><h3>#' + h.rank + ' · ' + X.esc(X.cleanName(h.name)) + '</h3>' +
+          '<div class="pc" style="color:' + hex + ';font-weight:600">' + X.esc(h.root_cause) + '</div>' +
+          '<div class="pc"><span class="pk">Impact</span> <b class="mono">' + Math.round(h.congestion_impact_index) + '</b>/100 · ' + h.persistence_tier + '</div>' +
+          '<div class="pc"><span class="pk">Trend</span> ' + h.trend + ' · <span class="pk">Recidivism</span> ' + h.recidivism + '</div>' +
+          '<div class="pc" style="margin-top:5px">→ ' + X.esc(h.recommended_fix) + '</div></div>';
+      }
+
+      function setSelected(h, fly) {
+        if (!h) return; selected = h.rank; var hex = X.causeHex(h.root_cause);
+        document.getElementById("selName").textContent = X.cleanName(h.name);
+        document.getElementById("selDesc").innerHTML = '<span style="color:' + hex + '">' + X.esc(h.root_cause) + '</span> · impact ' +
+          Math.round(h.congestion_impact_index) + ' · ' + h.persistence_tier + ' · ' + h.trend;
+        document.getElementById("selFix").textContent = "→ " + h.recommended_fix;
+        document.getElementById("teaserL").textContent = "#" + h.rank + " " + X.cleanName(h.name);
+        Object.values(markers).forEach(function (m) { if (m._path) m._path.setAttribute("stroke-width", "1.5"); });
+        var mk = markers[h.rank];
+        if (mk) {
+          if (fly) map.flyTo([h.lat, h.lon], Math.max(map.getZoom(), 15), { duration: .6 }); mk.openPopup();
+          if (mk._path) mk._path.setAttribute("stroke-width", "4");
+        }
+        document.querySelectorAll("#topList .tl-row").forEach(function (r) { r.style.background = (+r.dataset.rank === h.rank) ? "rgba(245,181,68,.12)" : ""; });
+      }
+
+      function render() {
+        var vis = visible();
+        Object.values(markers).forEach(function (m) { map.removeLayer(m); }); markers = {};
+        vis.forEach(function (h) {
+          var hex = X.causeHex(h.root_cause);
+          var mk = L.circleMarker([h.lat, h.lon], { radius: 5 + h.congestion_impact_index / 100 * 15, color: hex, weight: 1.5, fillColor: hex, fillOpacity: .62 }).addTo(map);
+          mk.bindPopup(popup(h)); mk.on("click", function () { setSelected(h, false); }); markers[h.rank] = mk;
+        });
+        document.getElementById("topLabel").textContent = "Top priorities" + (vis.length < D.hotspots.length ? " (" + vis.length + " shown)" : "");
+        var tl = document.getElementById("topList");
+        if (!vis.length) { tl.innerHTML = '<div style="font-size:11.5px;color:var(--muted);padding:6px 2px">No hotspots match these filters.</div>'; return; }
+        tl.innerHTML = vis.slice(0, 8).map(function (h) {
+          var hex = X.causeHex(h.root_cause);
+          return '<div class="tl-row" data-rank="' + h.rank + '"><span class="r">' + h.rank + '</span>' +
+            '<span class="n"><span class="pd" style="background:' + hex + '"></span>' + X.esc(X.cleanName(h.name)) + '</span>' +
+            '<span class="i">' + Math.round(h.congestion_impact_index) + '</span></div>';
+        }).join("");
+        tl.querySelectorAll(".tl-row").forEach(function (r) { r.onclick = function () { var h = vis.filter(function (x) { return x.rank === +r.dataset.rank; })[0]; setSelected(h, true); }; });
+        var cur = vis.filter(function (x) { return x.rank === selected; })[0];
+        setSelected(cur || vis[0], false);
+      }
+
+      // collapsible docks
+      function toggle(id) { var d = document.getElementById(id); d.classList.toggle("collapsed"); setTimeout(function () { map.invalidateSize(); }, 340); }
+      document.getElementById("headL").onclick = function () { toggle("dockL"); };
+      document.getElementById("headR").onclick = function () { toggle("dockR"); };
+
+      document.getElementById("search").addEventListener("input", function (e) { q = e.target.value; render(); });
+      // stop typing in search from toggling the dock
+      document.getElementById("search").addEventListener("click", function (e) { e.stopPropagation(); });
+
+      renderChips(); render();
+      var focus = new URLSearchParams(location.search).get("focus");
+      if (focus) { var h = D.hotspots.filter(function (x) { return x.rank === +focus; })[0]; if (h) setTimeout(function () { setSelected(h, true); }, 350); }
+    })();
+  </script>
+</body>
+
+</html>

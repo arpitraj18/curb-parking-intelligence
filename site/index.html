@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CURB — Command Center</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Geist:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="assets/curb.css">
+  <style>
+    body[data-page="command"] {
+      overflow: hidden
+    }
+
+    .cc {
+      height: calc(100vh - var(--head-h, 88px));
+      display: flex;
+      flex-direction: column;
+      max-width: 1380px;
+      margin: 0 auto;
+      padding: 18px 28px 16px;
+      min-height: 0
+    }
+
+    .cc-top {
+      flex: none
+    }
+
+    .cc .eyebrow {
+      margin-bottom: 5px;
+      font-size: 9px
+    }
+
+    .cc .page-title {
+      font-size: 23px;
+      margin: 0 0 13px
+    }
+
+    .cc .tiles {
+      margin-bottom: 16px;
+      gap: 14px
+    }
+
+    .cc .tile {
+      padding: 13px 15px
+    }
+
+    .cc .tile .v {
+      font-size: 25px
+    }
+
+    .cc .tile .k {
+      font-size: 9px;
+      margin-top: 9px
+    }
+
+    .cc-grid {
+      flex: 1;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 20px
+    }
+
+    .cc-col {
+      min-height: 0;
+      display: flex;
+      flex-direction: column
+    }
+
+    .cc-col .section-h {
+      margin: 0 0 4px;
+      flex: none;
+      font-size: 12px
+    }
+
+    /* fixed-height caption block so all three lists start at the same line */
+    .cc-col .col-note {
+      font-size: 10.5px;
+      color: var(--dim);
+      line-height: 1.45;
+      margin: 0 0 11px;
+      flex: none;
+      height: 30px;
+      overflow: hidden
+    }
+
+    .cc-scroll {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      padding-right: 6px
+    }
+
+    /* tighter cards on this page only */
+    body[data-page="command"] .hcard {
+      grid-template-columns: 24px 1fr auto;
+      gap: 10px;
+      padding: 10px 12px;
+      margin: 0 0 7px
+    }
+
+    body[data-page="command"] .hcard:first-child {
+      margin-top: 2px
+    }
+
+    body[data-page="command"] .hcard .rk {
+      font-size: 13px
+    }
+
+    body[data-page="command"] .hcard .nm {
+      font-size: 12px;
+      margin-bottom: 3px
+    }
+
+    body[data-page="command"] .hcard .cause {
+      font-size: 10.5px
+    }
+
+    body[data-page="command"] .hcard .fix {
+      font-size: 10.5px;
+      margin-top: 1px
+    }
+
+    body[data-page="command"] .hcard .note {
+      font-size: 9.5px;
+      margin-top: 2px
+    }
+
+    body[data-page="command"] .hcard .pill {
+      font-size: 9px;
+      margin-top: 5px
+    }
+
+    body[data-page="command"] .hcard .idx {
+      font-size: 17px
+    }
+
+    .hc-tag {
+      display: inline-block;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 8px;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: #2a1c00;
+      background: var(--amber-strong);
+      padding: 2px 6px;
+      margin-bottom: 5px;
+      font-weight: 600
+    }
+
+    .cc .panel {
+      padding: 15px 16px
+    }
+
+    .cc .barrow {
+      font-size: 11px;
+      margin: 7px 0;
+      grid-template-columns: 120px 1fr 40px
+    }
+
+    @media (max-width:980px) {
+      body[data-page="command"] {
+        overflow: auto
+      }
+
+      .cc {
+        height: auto;
+        display: block
+      }
+
+      .cc-grid {
+        display: block
+      }
+
+      .cc-col {
+        display: block;
+        margin-bottom: 22px
+      }
+
+      .cc-col .col-note {
+        height: auto
+      }
+
+      .cc-scroll {
+        overflow: visible;
+        padding-right: 0
+      }
+    }
+  </style>
+</head>
+
+<body data-page="command">
+  <div id="curb-header"></div>
+
+  <div class="cc">
+    <div class="cc-top">
+
+      <div class="tiles" id="tiles"></div>
+    </div>
+
+    <div class="cc-grid">
+      <div class="cc-col">
+        <h2 class="section-h">High-Conviction Watchlist</h2>
+        <p class="col-note">High-impact, worsening, and drawing the same vehicles back. Start here.</p>
+        <div class="cc-scroll" id="watchlist"></div>
+      </div>
+      <div class="cc-col">
+        <h2 class="section-h">Top by Obstruction Impact</h2>
+        <p class="col-note">Ranked by severity × vehicle footprint across the data window.</p>
+        <div class="cc-scroll" id="topImpact"></div>
+      </div>
+      <div class="cc-col">
+        <h2 class="section-h">City Signal</h2>
+        <p class="col-note">Distribution across the ranked priority hotspots.</p>
+        <div class="cc-scroll">
+          <div class="panel">
+            <p class="eyebrow">By root cause</p>
+            <div id="causeBars"></div>
+            <p class="eyebrow" style="margin-top:16px">By persistence</p>
+            <div id="tierBars"></div>
+            <p class="eyebrow" style="margin-top:16px">By trend</p>
+            <div id="trendBars"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/curb-data.js"></script>
+  <script src="assets/curb-app.js"></script>
+  <script src="assets/curb-nav.js"></script>
+  <script>
+    (function () {
+      var D = window.CURB, X = window.CURBX;
+      function go(h) {
+        document.body.classList.remove("curb-ready");
+        setTimeout(function () { location.href = "map.html?focus=" + h.rank; }, 200);
+      }
+
+      var cov50 = (D.agg.coverage.filter(function (c) { return c.n === 50; })[0] || {}).pct;
+      var tiles = [
+        { v: D.meta.hotspot_count.toLocaleString(), k: "Hotspots ranked" },
+        { v: D.agg.chronic, k: "Chronic standing posts" },
+        { v: cov50 + "<span class='u'>%</span>", k: "Top-50 impact coverage" },
+        { v: D.meta.high_conviction, k: "High-conviction spots", accent: true },
+      ];
+      document.getElementById("tiles").innerHTML = tiles.map(function (t) {
+        return '<div class="tile' + (t.accent ? ' accent' : '') + '"><div class="v">' + t.v + '</div><div class="k">' + t.k + '</div></div>';
+      }).join("");
+
+      var hc = D.hotspots.filter(function (h) { return h.high_conviction; });
+      var wl = document.getElementById("watchlist");
+      if (hc.length) {
+        hc.forEach(function (h) {
+          var c = X.card(h, go);
+          var nm = c.querySelector(".nm");
+          if (nm) nm.insertAdjacentHTML("beforebegin", '<span class="hc-tag">High-conviction</span>');
+          wl.appendChild(c);
+        });
+      }
+      var broader = D.hotspots.filter(function (h) { return h.rank <= 100 && (h.trend === "Emerging" || h.recidivism === "Habitual") && !h.high_conviction; }).slice(0, 8);
+      if (broader.length) {
+        wl.insertAdjacentHTML("beforeend", '<p class="eyebrow" style="margin:12px 0 6px">Elevated — top-100 impact, emerging or habitual</p>');
+        broader.forEach(function (h) { wl.appendChild(X.card(h, go)); });
+      }
+
+      var ti = document.getElementById("topImpact");
+      D.hotspots.slice(0, 12).forEach(function (h) { ti.appendChild(X.card(h, go)); });
+
+      function bars(el, obj, colorFn) {
+        var max = Math.max.apply(null, Object.values(obj)) || 1;
+        document.getElementById(el).innerHTML = Object.keys(obj).map(function (k) {
+          return '<div class="barrow"><div class="lab">' + X.esc(k) + '</div>' +
+            '<div class="track"><div class="fill" style="width:' + (obj[k] / max * 100) + '%;background:' + colorFn(k) + '"></div></div>' +
+            '<div class="n">' + obj[k] + '</div></div>';
+        }).join("");
+      }
+      bars("causeBars", D.agg.cause, function (k) { return X.causeHex(k); });
+      bars("tierBars", D.agg.tier, function (k) { return { Chronic: "#E5564B", Frequent: "#F0A93B", Occasional: "#8C8C8C" }[k] || "#8C8C8C"; });
+      bars("trendBars", D.agg.trend, function (k) { return { Emerging: "#E5564B", Stable: "#8C8C8C", Cooling: "#4C9BE6" }[k] || "#8C8C8C"; });
+    })();
+  </script>
+</body>
+
+</html>

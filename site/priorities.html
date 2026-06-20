@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CURB — Priorities</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Geist:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/curb.css">
+</head>
+<body data-page="priorities">
+<div id="curb-header"></div>
+
+<div class="page page-wide">
+
+
+  <div style="display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap;margin:0 0 18px">
+    <div class="chips" id="causeChips" style="flex:1;min-width:280px"></div>
+    <input class="search" id="search" placeholder="Search junction or area…" style="width:240px;margin:0">
+  </div>
+
+  <table class="dtable">
+    <thead><tr>
+      <th data-sort="rank"># <span class="material-symbols-outlined">unfold_more</span></th>
+      <th data-sort="name">Hotspot</th>
+      <th data-sort="root_cause">Cause</th>
+      <th data-sort="congestion_impact_index" class="num">Impact</th>
+      <th data-sort="persistence_tier">Persistence</th>
+      <th data-sort="trend">Trend</th>
+      <th>Recommended fix</th>
+    </tr></thead>
+    <tbody id="rows"></tbody>
+  </table>
+  <p class="caveat">Impact is a normalised index (severity × vehicle footprint), not measured traffic. Click a row to locate it on the map.</p>
+</div>
+
+<script src="assets/curb-data.js"></script>
+<script src="assets/curb-app.js"></script>
+<script src="assets/curb-nav.js"></script>
+<script>
+(function(){
+  var D=window.CURB, X=window.CURBX;
+  var causes=Object.keys(X.CAUSE), fCause=[], q="", sortKey="rank", sortAsc=true;
+
+  document.getElementById("causeChips").innerHTML=causes.map(function(c){
+    return '<span class="chip" data-v="'+c+'"><span class="dot" style="background:'+X.causeHex(c)+'"></span>'+X.esc(c)+'</span>';
+  }).join("");
+  document.querySelectorAll("#causeChips .chip").forEach(function(el){
+    el.onclick=function(){var v=el.dataset.v,i=fCause.indexOf(v);
+      if(i>=0){fCause.splice(i,1);el.classList.remove("on");el.style.cssText="";}
+      else{fCause.push(v);el.classList.add("on");el.style.cssText="border-color:"+X.causeHex(v)+"99;background:"+X.causeHex(v)+"22";}
+      render();};
+  });
+  document.getElementById("search").addEventListener("input",function(e){q=e.target.value;render();});
+  document.querySelectorAll("th[data-sort]").forEach(function(th){
+    th.onclick=function(){var k=th.dataset.sort; if(sortKey===k)sortAsc=!sortAsc; else{sortKey=k;sortAsc=(k==="rank");} render();};
+  });
+
+  var max=Math.max.apply(null,D.hotspots.map(function(h){return h.congestion_impact_index;}));
+  function go(rank){document.body.classList.remove("curb-ready");setTimeout(function(){location.href="map.html?focus="+rank;},200);}
+
+  function render(){
+    var rows=D.hotspots.filter(function(h){
+      if(fCause.length&&fCause.indexOf(h.root_cause)<0)return false;
+      if(q&&(h.name||"").toLowerCase().indexOf(q.toLowerCase())<0)return false;
+      return true;
+    });
+    rows.sort(function(a,b){var x=a[sortKey],y=b[sortKey];
+      if(typeof x==="string"){x=x.toLowerCase();y=(y||"").toLowerCase();}
+      return (x<y?-1:x>y?1:0)*(sortAsc?1:-1);});
+    document.getElementById("rows").innerHTML=rows.map(function(h){
+      var hex=X.causeHex(h.root_cause);
+      return '<tr data-rank="'+h.rank+'">'+
+        '<td class="num" style="color:var(--dim)">'+h.rank+'</td>'+
+        '<td>'+X.esc(X.cleanName(h.name))+'</td>'+
+        '<td><span class="cause-dot" style="background:'+hex+'"></span>'+X.esc(h.root_cause)+'</td>'+
+        '<td class="num"><div style="display:flex;align-items:center;justify-content:flex-end;gap:8px;white-space:nowrap"><span>'+Math.round(h.congestion_impact_index)+'</span>'+
+          '<span class="bar" style="flex:none"><span style="width:'+(h.congestion_impact_index/max*100)+'%;background:'+hex+'"></span></span></div></td>'+
+        '<td><span class="pill '+h.persistence_tier+'" style="margin:0">'+h.persistence_tier+'</span></td>'+
+        '<td><span class="badge '+h.trend+'" style="margin:0">'+h.trend+'</span></td>'+
+        '<td style="color:var(--muted)">'+X.esc(h.recommended_fix)+'</td>'+
+      '</tr>';
+    }).join("");
+    document.querySelectorAll("#rows tr").forEach(function(tr){tr.onclick=function(){go(tr.dataset.rank);};});
+  }
+  render();
+})();
+</script>
+</body></html>
