@@ -1078,7 +1078,7 @@ body[data-page="assistant"] .page {
   border-top: 1px solid var(--hairline-soft);
   position: sticky;
   bottom: 0;
-  background: var(--bg)
+  background: transparent;
 }
 
 .askbar input {
@@ -1337,7 +1337,7 @@ body[data-page="map"] {
 }
 
 [data-theme="light"] .askbar {
-  background: linear-gradient(180deg, #ffffff 0%, #f7f7f7 100%);
+  background: transparent;
 }
 
 [data-theme="light"] .chip {
@@ -1408,7 +1408,7 @@ body[data-page="map"] {
 
 /* askbar */
 [data-theme="light"] .askbar {
-  background: var(--bg)
+  background: transparent;
 }
 
 

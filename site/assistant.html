@@ -1,195 +1,222 @@
 <!DOCTYPE html>
-<html lang="en"><head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CURB — Assistant</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Geist:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/curb.css?v=35">
-</head>
-<body data-page="assistant">
-<div id="curb-header"></div>
+<html lang="en">
 
-<div class="page">
-  <style>
-    .welcome-state {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      padding: 10px 20px 10px;
-      margin: auto 0;
-    }
-    .welcome-state .icon-circle {
-      width: 38px;
-      height: 38px;
-      background: var(--surface);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 12px;
-      color: var(--amber-strong);
-    }
-    .welcome-state .icon-circle .material-symbols-outlined {
-      font-size: 20px;
-    }
-    .welcome-state h1 {
-      font-family: "Geist", sans-serif;
-      font-size: 24px;
-      font-weight: 500;
-      margin: 0 0 6px;
-      letter-spacing: -0.02em;
-    }
-    .welcome-state p {
-      font-size: 13px;
-      color: var(--muted);
-      max-width: 460px;
-      line-height: 1.4;
-      margin: 0 0 16px;
-    }
-    .sugg-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-      width: 100%;
-      text-align: left;
-    }
-    .sugg-card {
-      background: var(--surface);
-      border: 1px solid transparent;
-      border-radius: 12px;
-      padding: 10px 14px;
-      cursor: pointer;
-      transition: all .2s var(--ease);
-    }
-    .sugg-card:hover {
-      border-color: var(--amber-strong);
-      background: var(--raised);
-    }
-    .sugg-card .sl {
-      font-family: "JetBrains Mono", monospace;
-      font-size: 10px;
-      letter-spacing: .06em;
-      text-transform: uppercase;
-      font-weight: 600;
-      color: var(--text);
-      margin-bottom: 8px;
-    }
-    .sugg-card .st {
-      font-size: 13px;
-      color: var(--text);
-      line-height: 1.4;
-    }
-    @media (max-width: 640px) {
-      .sugg-grid { grid-template-columns: 1fr; }
-    }
-  </style>
-  <div class="chatwrap">
-    <div class="msgs" id="msgs">
-      <div id="welcome" class="welcome-state fade-in">
-        <div class="icon-circle">
-          <span class="material-symbols-outlined">auto_awesome</span>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CURB — Assistant</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Geist:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="assets/curb.css?v=36">
+</head>
+
+<body data-page="assistant">
+  <div id="curb-header"></div>
+
+  <div class="page">
+    <style>
+      .welcome-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 10px 20px 10px;
+        margin: auto 0;
+      }
+
+      .welcome-state .icon-circle {
+        width: 38px;
+        height: 38px;
+        background: var(--surface);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 12px;
+        color: var(--amber-strong);
+      }
+
+      .welcome-state .icon-circle .material-symbols-outlined {
+        font-size: 20px;
+      }
+
+      .welcome-state h1 {
+        font-family: "Geist", sans-serif;
+        font-size: 24px;
+        font-weight: 500;
+        margin: 0 0 6px;
+        letter-spacing: -0.02em;
+      }
+
+      .welcome-state p {
+        font-size: 13px;
+        color: var(--muted);
+        max-width: 460px;
+        line-height: 1.4;
+        margin: 0 0 16px;
+      }
+
+      .sugg-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        width: 100%;
+        text-align: left;
+      }
+
+      .sugg-card {
+        background: var(--surface);
+        border: 1px solid transparent;
+        border-radius: 12px;
+        padding: 10px 14px;
+        cursor: pointer;
+        transition: all .2s var(--ease);
+      }
+
+      .sugg-card:hover {
+        border-color: var(--amber-strong);
+        background: var(--raised);
+      }
+
+      .sugg-card .sl {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 10px;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+        font-weight: 600;
+        color: var(--text);
+        margin-bottom: 8px;
+      }
+
+      .sugg-card .st {
+        font-size: 13px;
+        color: var(--text);
+        line-height: 1.4;
+      }
+
+      @media (max-width: 640px) {
+        .sugg-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+    <div class="chatwrap">
+      <div class="msgs" id="msgs">
+        <div id="welcome" class="welcome-state fade-in">
+          <div class="icon-circle">
+            <span class="material-symbols-outlined">auto_awesome</span>
+          </div>
+          <h1 id="greeting">Good Afternoon, Admin.</h1>
+          <p>Ask in plain language about the ranked hotspots — by cause, area, persistence, or trend. Every answer comes
+            straight from the provided enforcement data.</p>
+          <div class="sugg-grid" id="suggGrid"></div>
         </div>
-        <h1 id="greeting">Good Afternoon, Admin.</h1>
-        <p>Analyze real-time traffic anomalies, dispatch units, or query historic hotspot data through our intelligent neural core.</p>
-        <div class="sugg-grid" id="suggGrid"></div>
+      </div>
+      <div class="askbar">
+        <input id="q" placeholder="e.g. top delivery hotspots, or chronic safety spots near HSR" autocomplete="off">
+        <button id="send"><span class="material-symbols-outlined" style="font-size: 18px;">send</span></button>
       </div>
     </div>
-    <div class="askbar">
-      <input id="q" placeholder="e.g. top delivery hotspots, or chronic safety spots near HSR" autocomplete="off">
-      <button id="send"><span class="material-symbols-outlined" style="font-size: 18px;">send</span></button>
-    </div>
   </div>
-</div>
 
-<script src="assets/curb-data.js"></script>
-<script src="assets/curb-app.js"></script>
-<script src="assets/curb-nav.js"></script>
-<script>
-(function(){
-  var X=window.CURBX;
-  var msgs=document.getElementById("msgs"), input=document.getElementById("q");
-  var suggGrid=document.getElementById("suggGrid"), welcome=document.getElementById("welcome");
-  var asked=false;
+  <script src="assets/curb-data.js"></script>
+  <script src="assets/curb-app.js"></script>
+  <script src="assets/curb-nav.js"></script>
+  <script>
+    (function () {
+      var X = window.CURBX;
+      var msgs = document.getElementById("msgs"), input = document.getElementById("q");
+      var suggGrid = document.getElementById("suggGrid"), welcome = document.getElementById("welcome");
+      var asked = false;
 
-  // Set dynamic greeting based on time of day
-  var hour = new Date().getHours();
-  var greetingText = hour < 12 ? "Good Morning" : hour < 18 ? "Good Afternoon" : "Good Evening";
-  document.getElementById("greeting").textContent = greetingText + ", Admin.";
+      // Set dynamic greeting based on time of day
+      var hour = new Date().getHours();
+      var greetingText = hour < 12 ? "Good Morning" : hour < 18 ? "Good Afternoon" : "Good Evening";
+      document.getElementById("greeting").textContent = greetingText + ", Admin.";
 
-  var SUGG_CARDS = [
-    { label: "Real-Time Analysis", text: "Show me the top 5 delivery hotspots in the central business district right now." },
-    { label: "History & Trends", text: "How does current congestion at MG Road compare to last Friday's monsoon peak?" },
-    { label: "Optimization", text: "Find the most efficient dispatch path for Unit 402 to reach the Indiranagar clog." },
-    { label: "Reporting", text: "Generate a summary of recurring chronic hotspots within 2km of Whitefield." }
-  ];
+      var SUGG_CARDS = [
+        { label: "By cause", text: "Show me the top 5 delivery hotspots." },
+        { label: "Safety", text: "Chronic safety-risk spots." },
+        { label: "What's worsening", text: "Which commuter hotspots are emerging?" },
+        { label: "Worst overall", text: "The 5 highest-impact spots overall." }
+      ];
 
-  suggGrid.innerHTML = SUGG_CARDS.map(function(c){
-    return '<div class="sugg-card"><div class="sl">' + X.esc(c.label) + '</div><div class="st">"' + X.esc(c.text) + '"</div></div>';
-  }).join("");
+      suggGrid.innerHTML = SUGG_CARDS.map(function (c) {
+        return '<div class="sugg-card"><div class="sl">' + X.esc(c.label) + '</div><div class="st">"' + X.esc(c.text) + '"</div></div>';
+      }).join("");
 
-  suggGrid.querySelectorAll(".sugg-card").forEach(function(card, i){
-    card.onclick = function() { ask(SUGG_CARDS[i].text); };
-  });
+      suggGrid.querySelectorAll(".sugg-card").forEach(function (card, i) {
+        card.onclick = function () { ask(SUGG_CARDS[i].text); };
+      });
 
-  function hideWelcome(){
-    if(!asked){ asked=true; welcome.style.display="none"; }
-  }
+      function hideWelcome() {
+        if (!asked) { asked = true; welcome.style.display = "none"; }
+      }
 
-  function bubble(who,html,noScroll){
-    var d=document.createElement("div"); d.className="msg "+who+" fade-in";
-    d.innerHTML='<div class="av">'+(who==="bot"?"AI":"You")+'</div><div class="body">'+html+'</div>';
-    msgs.appendChild(d);
-    if(!noScroll) window.scrollTo(0, document.body.scrollHeight);
-    return d;
-  }
-  function go(rank){document.body.classList.remove("curb-ready");setTimeout(function(){location.href="map.html?focus="+rank;},200);}
+      function bubble(who, html, noScroll) {
+        var d = document.createElement("div"); d.className = "msg " + who + " fade-in";
+        d.innerHTML = '<div class="av">' + (who === "bot" ? "AI" : "You") + '</div><div class="body">' + html + '</div>';
+        msgs.appendChild(d);
+        if (!noScroll) window.scrollTo(0, document.body.scrollHeight);
+        return d;
+      }
+      function go(rank) { document.body.classList.remove("curb-ready"); setTimeout(function () { location.href = "map.html?focus=" + rank; }, 200); }
 
-  // normalise either schema (full hotspot OR compact API row) into one shape
-  function norm(h){return {rank:h.rank, name:X.cleanName(h.name), cause:h.root_cause||h.cause,
-    impact:Math.round(h.congestion_impact_index!=null?h.congestion_impact_index:h.impact),
-    tier:h.persistence_tier||h.persistence, fix:h.recommended_fix||h.fix};}
-  function cards(rows){
-    return '<div style="margin-top:6px">'+rows.map(function(r){var h=norm(r);
-      return '<div class="res" data-rank="'+h.rank+'" style="--cc:'+X.causeVar(h.cause)+'">'+
-        '<div class="rn">#'+h.rank+' · '+X.esc(h.name)+'</div>'+
-        '<div class="rc">'+X.esc(h.cause)+' · impact '+h.impact+' · '+h.tier+'</div>'+
-        '<div class="rl">→ '+X.esc(h.fix)+' · open on map</div></div>';
-    }).join("")+'</div>';
-  }
-  function renderResults(node, answer, rows){
-    var html = X.esc(answer);
-    if(rows && rows.length) html += cards(rows);
-    node.querySelector(".body").innerHTML=html;
-    node.querySelectorAll(".res").forEach(function(r){r.onclick=function(){go(r.dataset.rank);};});
-  }
-  function deterministic(q, node){
-    var res=X.query(q).map(norm);
-    if(!res.length){ node.querySelector(".body").innerHTML="I couldn't find matching hotspots. Try a cause (delivery, safety, commuter, hire) or a different area."; return; }
-    var t=res[0];
-    var answer="Here "+(res.length===1?"is":"are")+" the top "+res.length+" by obstruction impact — leading with "+
-      t.name+" ("+t.cause.toLowerCase()+", impact "+t.impact+").";
-    renderResults(node, answer, res);
-  }
+      // normalise either schema (full hotspot OR compact API row) into one shape
+      function norm(h) {
+        return {
+          rank: h.rank, name: X.cleanName(h.name), cause: h.root_cause || h.cause,
+          impact: Math.round(h.congestion_impact_index != null ? h.congestion_impact_index : h.impact),
+          tier: h.persistence_tier || h.persistence, fix: h.recommended_fix || h.fix
+        };
+      }
+      function cards(rows) {
+        return '<div style="margin-top:6px">' + rows.map(function (r) {
+          var h = norm(r);
+          return '<div class="res" data-rank="' + h.rank + '" style="--cc:' + X.causeVar(h.cause) + '">' +
+            '<div class="rn">#' + h.rank + ' · ' + X.esc(h.name) + '</div>' +
+            '<div class="rc">' + X.esc(h.cause) + ' · impact ' + h.impact + ' · ' + h.tier + '</div>' +
+            '<div class="rl">→ ' + X.esc(h.fix) + ' · open on map</div></div>';
+        }).join("") + '</div>';
+      }
+      function renderResults(node, answer, rows) {
+        var html = X.esc(answer);
+        if (rows && rows.length) html += cards(rows);
+        node.querySelector(".body").innerHTML = html;
+        node.querySelectorAll(".res").forEach(function (r) { r.onclick = function () { go(r.dataset.rank); }; });
+      }
+      function deterministic(q, node) {
+        var res = X.query(q).map(norm);
+        if (!res.length) { node.querySelector(".body").innerHTML = "I couldn't find matching hotspots. Try a cause (delivery, safety, commuter, hire) or a different area."; return; }
+        var t = res[0];
+        var answer = "Here " + (res.length === 1 ? "is" : "are") + " the top " + res.length + " by obstruction impact — leading with " +
+          t.name + " (" + t.cause.toLowerCase() + ", impact " + t.impact + ").";
+        renderResults(node, answer, res);
+      }
 
-  function ask(text){
-    var q=(text||input.value).trim(); if(!q)return; input.value=""; hideWelcome();
-    bubble("me",X.esc(q));
-    var typing=bubble("bot",'<span class="typing"><span></span><span></span><span></span></span>');
+      function ask(text) {
+        var q = (text || input.value).trim(); if (!q) return; input.value = ""; hideWelcome();
+        bubble("me", X.esc(q));
+        var typing = bubble("bot", '<span class="typing"><span></span><span></span><span></span></span>');
 
-    // Try the live GenAI endpoint; fall back to deterministic phrasing on any failure.
-    fetch("api/assistant",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question:q})})
-      .then(function(r){ if(!r.ok) throw new Error("status "+r.status); return r.json(); })
-      .then(function(d){
-        if(d && d.answer){ renderResults(typing, d.answer, d.results||[]); }
-        else { deterministic(q, typing); }
-      })
-      .catch(function(){ deterministic(q, typing); });
-  }
-  document.getElementById("send").onclick=function(){ask();};
-  input.addEventListener("keydown",function(e){if(e.key==="Enter")ask();});
-})();
-</script>
-</body></html>
+        // Try the live GenAI endpoint; fall back to deterministic phrasing on any failure.
+        fetch("api/assistant", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ question: q }) })
+          .then(function (r) { if (!r.ok) throw new Error("status " + r.status); return r.json(); })
+          .then(function (d) {
+            if (d && d.answer) { renderResults(typing, d.answer, d.results || []); }
+            else { deterministic(q, typing); }
+          })
+          .catch(function () { deterministic(q, typing); });
+      }
+      document.getElementById("send").onclick = function () { ask(); };
+      input.addEventListener("keydown", function (e) { if (e.key === "Enter") ask(); });
+    })();
+  </script>
+</body>
+
+</html>

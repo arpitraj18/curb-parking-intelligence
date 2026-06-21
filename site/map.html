@@ -13,7 +13,7 @@
     href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-  <link rel="stylesheet" href="assets/curb.css?v=35">
+  <link rel="stylesheet" href="assets/curb.css?v=38">
   <style>
     body[data-page="map"] {
       overflow: hidden
@@ -32,16 +32,34 @@
       background: #e8e8e6
     }
 
-    /* push leaflet zoom controls below the floating nav */
+    /* zoom controls: horizontal, top-right */
     .leaflet-top.leaflet-left {
-      margin-top: calc(var(--head-h, 88px) + 22px);
-      margin-left: 14px
+      top: calc(var(--head-h, 88px) + 24px) !important;
+      left: auto !important;
+      right: 16px;
+    }
+
+    .leaflet-control-zoom {
+      display: flex !important;
+      flex-direction: row !important;
+      border-radius: 10px !important;
+      overflow: hidden;
+      border: 1px solid var(--hairline) !important;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
     }
 
     .leaflet-control-zoom a {
       background: var(--surface) !important;
       color: var(--text) !important;
-      border-color: var(--hairline) !important
+      border: none !important;
+      width: 36px !important;
+      height: 36px !important;
+      line-height: 36px !important;
+      font-size: 16px !important;
+    }
+
+    .leaflet-control-zoom a:first-child {
+      border-right: 1px solid var(--hairline) !important;
     }
 
     .leaflet-control-attribution {
