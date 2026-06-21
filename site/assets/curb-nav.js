@@ -42,6 +42,23 @@
     var current = NAV.filter(function (n) { return n.key === page; })[0] || NAV[0];
     var theme = currentTheme();
 
+    // Inject global ambient mouse glow
+    if (!document.querySelector(".ambient-mouse-glow")) {
+      var glow = document.createElement("div");
+      glow.className = "ambient-mouse-glow";
+      document.body.appendChild(glow);
+      var ticking = false;
+      document.addEventListener("mousemove", function (e) {
+        if (!ticking) {
+          window.requestAnimationFrame(function () {
+            glow.style.transform = "translate(" + e.clientX + "px, " + e.clientY + "px)";
+            ticking = false;
+          });
+          ticking = true;
+        }
+      });
+    }
+
     var links = NAV.map(function (n) {
       return '<a href="' + n.href + '" data-nav="' + n.key + '" class="' +
         (n.key === page ? "active" : "") + '">' + n.label + "</a>";
@@ -49,22 +66,23 @@
 
     var html =
       '<header class="curb-head">' +
-        '<div class="curb-brand">' +
-          '<h1 class="curb-logo">C<span>U</span>RB</h1>' +
-          '<div class="curb-sub">' +
-            '<span class="oi">Operational Intelligence</span>' +
-            '<span class="pg">' + current.label + "</span>" +
-          "</div>" +
-        "</div>" +
-        '<nav class="curb-nav">' + links + "</nav>" +
-        '<div class="curb-sys">' +
-          '<span class="material-symbols-outlined theme-toggle" id="themeToggle" title="' +
-            (theme === "dark" ? "Switch to light mode" : "Switch to dark mode") + '">' +
-            (theme === "dark" ? "light_mode" : "dark_mode") +
-          "</span>" +
-          '<span class="material-symbols-outlined" title="Alerts">notifications</span>' +
-          '<span class="material-symbols-outlined" title="Operator">account_circle</span>' +
-        "</div>" +
+      '<div class="header-dots"></div>' +
+      '<div class="curb-brand">' +
+      '<h1 class="curb-logo">C<span>U</span>RB</h1>' +
+      '<div class="curb-sub">' +
+      '<span class="oi">Operational Intelligence</span>' +
+      '<span class="pg">' + current.label + "</span>" +
+      "</div>" +
+      "</div>" +
+      '<nav class="curb-nav">' + links + "</nav>" +
+      '<div class="curb-sys">' +
+      '<span class="material-symbols-outlined theme-toggle" id="themeToggle" title="' +
+      (theme === "dark" ? "Switch to light mode" : "Switch to dark mode") + '">' +
+      (theme === "dark" ? "light_mode" : "dark_mode") +
+      "</span>" +
+      '<span class="material-symbols-outlined" title="Alerts">notifications</span>' +
+      '<span class="material-symbols-outlined" title="Operator">account_circle</span>' +
+      "</div>" +
       "</header>";
 
     var mount = document.getElementById("curb-header");
@@ -74,6 +92,20 @@
     // Wire up the toggle
     var btn = document.getElementById("themeToggle");
     if (btn) btn.addEventListener("click", toggleTheme);
+
+    // Wire up header dot grid mouse tracking
+    var headEl = document.querySelector("header.curb-head");
+    if (headEl) {
+      headEl.addEventListener("mousemove", function (e) {
+        var rect = headEl.getBoundingClientRect();
+        headEl.style.setProperty("--hx", (e.clientX - rect.left) + "px");
+        headEl.style.setProperty("--hy", (e.clientY - rect.top) + "px");
+      });
+      headEl.addEventListener("mouseleave", function () {
+        headEl.style.setProperty("--hx", "-200px");
+        headEl.style.setProperty("--hy", "-200px");
+      });
+    }
 
     // expose exact header height so fixed/sticky offsets are pixel-correct
     function setH() {
