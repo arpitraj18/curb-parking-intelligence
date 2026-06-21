@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>CURB — Command Center</title>
+  <title>CURB - Command Center</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -219,6 +219,16 @@
       align-items: center;
     }
 
+    .cc-col:last-child .eyebrow {
+      margin-bottom: 1px !important;
+      font-size: 8.5px;
+      margin-top: 2px !important;
+    }
+
+    .cc-col:last-child .barrow .track {
+      height: 6px;
+    }
+
     @media (max-width:980px) {
       body[data-page="command"] {
         overflow: auto
@@ -277,7 +287,7 @@
       <div class="cc-col">
         <h2 class="section-h">City Signal</h2>
         <p class="col-note">Distribution across the ranked priority hotspots.</p>
-        <div class="cc-scroll" style="mask-image: none; -webkit-mask-image: none; padding-right: 0; padding-bottom: 0;">
+        <div class="cc-scroll" style="mask-image: none; -webkit-mask-image: none; padding-right: 0; padding-bottom: 8px; overflow: hidden;">
           <div class="panel">
             <p class="eyebrow" style="margin-bottom:2px">By root cause</p>
             <div id="causeBars"></div>
