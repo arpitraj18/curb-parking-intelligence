@@ -126,7 +126,61 @@
     });
   }
 
+  /* ---- intro splash (self-contained, additive overlay; shown once per visit) ----
+     Lives entirely here so curb.css and the page HTML are untouched. It sits ABOVE
+     the page, fades out, and removes itself. Uses your theme vars + Geist font, so
+     it matches dark/light automatically. Edit the `quotes` array to use your own. */
+  function splash() {
+    var quotes = [
+      "Every blocked kerb is a street deciding to stop moving.",
+      "Congestion isn't chaos \u2014 it's a pattern waiting to be read.",
+      "The street tells you where it hurts. CURB listens.",
+      "Order the kerb, and the road follows."
+    ];
+
+    // shown once per browser session; delete these 3 lines to show on every load
+    var seen = false;
+    try { seen = sessionStorage.getItem("curb_splash") === "1"; } catch (e) { }
+    if (seen) return;
+    try { sessionStorage.setItem("curb_splash", "1"); } catch (e) { }
+
+    if (!document.getElementById("curb-splash-style")) {
+      var st = document.createElement("style");
+      st.id = "curb-splash-style";
+      st.textContent =
+        '#curb-splash{position:fixed;inset:0;z-index:5000;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--bg);background-image:radial-gradient(circle at 50% 44%, rgba(46,37,23,.7), transparent 60%);transition:opacity .6s var(--ease)}' +
+        '[data-theme="light"] #curb-splash{background-image:radial-gradient(circle at 50% 44%, rgba(180,165,145,.3), transparent 60%)}' +
+        '#curb-splash.done{opacity:0;pointer-events:none}' +
+        '#curb-splash .sp-logo{font-family:"Geist",sans-serif;font-weight:800;font-size:62px;letter-spacing:.18em;text-transform:uppercase;color:var(--text);opacity:0;animation:spIn .9s var(--ease) .15s forwards}' +
+        '#curb-splash .sp-logo span{color:var(--amber-strong)}' +
+        '#curb-splash .sp-tag{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.34em;text-transform:uppercase;color:var(--amber);margin-top:12px;opacity:0;animation:spIn .8s var(--ease) .5s forwards}' +
+        '#curb-splash .sp-line{height:2px;width:0;background:var(--amber-strong);margin:24px 0;animation:spLine 1.1s var(--ease) .55s forwards}' +
+        '#curb-splash .sp-quote{font-family:"Geist",sans-serif;font-style:italic;font-size:15px;color:var(--muted);max-width:440px;text-align:center;line-height:1.6;opacity:0;animation:spIn 1s var(--ease) .95s forwards}' +
+        '@keyframes spIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}' +
+        '@keyframes spLine{from{width:0}to{width:210px}}' +
+        '@media (prefers-reduced-motion:reduce){#curb-splash .sp-logo,#curb-splash .sp-tag,#curb-splash .sp-quote{opacity:1;animation:none}#curb-splash .sp-line{width:210px;animation:none}}';
+      document.head.appendChild(st);
+    }
+
+    var q = quotes[Math.floor(Math.random() * quotes.length)];
+    var el = document.createElement("div");
+    el.id = "curb-splash";
+    el.innerHTML =
+      '<div class="sp-logo">C<span>U</span>RB</div>' +
+      '<div class="sp-tag">Operational Intelligence</div>' +
+      '<div class="sp-line"></div>' +
+      '<div class="sp-quote">\u201C' + q + '\u201D</div>';
+    document.body.appendChild(el);
+
+    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion:reduce)").matches;
+    setTimeout(function () {
+      el.classList.add("done");
+      setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 650);
+    }, reduce ? 1100 : 2600);
+  }
+
   function ready() {
+    splash();
     build();
     requestAnimationFrame(function () { document.body.classList.add("curb-ready"); });
   }
