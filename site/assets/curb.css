@@ -1869,7 +1869,6 @@ body[data-page="map"] {
   background: linear-gradient(180deg, rgba(230, 223, 211, .97), rgba(230, 223, 211, .88))
 }
 
-<<<<<<< HEAD
 /* ---------- mobile metrics bar (map page) ---------- */
 .metrics-bar {
   display: none;
@@ -1935,7 +1934,8 @@ body[data-page="map"] {
     align-items: center;
     justify-content: center;
   }
-=======
+}
+
 [data-theme="light"] nav.curb-nav a {
   text-shadow: 0 1px 2px rgba(255, 255, 255, 0.6);
 }
@@ -1946,7 +1946,6 @@ body[data-page="map"] {
 
 [data-theme="light"] nav.curb-nav a.active {
   text-shadow: 0 0 6px rgba(179, 113, 0, 0.3);
->>>>>>> b38331b8e853ff193ec0ba17e367274d20cc2859
 }
 
 /* map-page floating header */
@@ -1957,7 +1956,29 @@ body[data-page="map"] {
 
 /* map docks */
 [data-theme="light"] .dock {
-  background: rgba(239, 233, 223, .92)
+  background: rgba(230, 223, 211, .95);
+  border-color: #d0c8bc;
+}
+
+[data-theme="light"] .dock-body .tl-row {
+  background: #ffffff;
+  border: 1px solid #e5ddd2;
+  border-radius: 6px;
+  padding: 7px 8px;
+  margin-bottom: 4px;
+  gap: 8px;
+}
+
+[data-theme="light"] .dock-body .tl-row:hover {
+  background: #f7f4ef;
+}
+
+[data-theme="light"] .hcard {
+  background: #ffffff;
+}
+
+[data-theme="light"] .hcard:hover {
+  background: #f7f4ef;
 }
 
 /* leaflet controls */
