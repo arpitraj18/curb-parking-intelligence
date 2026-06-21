@@ -138,14 +138,16 @@ body.curb-ready {
 
 /* ---------- shared header / nav ---------- */
 header.curb-head {
-  position: sticky;
+  position: fixed;
   top: 12px;
+  left: 0;
+  right: 0;
   z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 10px 24px;
-  margin: 16px 16px 24px;
+  margin: 0 16px;
   border-radius: 12px;
   background: linear-gradient(180deg, rgba(32, 26, 18, .97), rgba(32, 26, 18, .88));
   backdrop-filter: blur(12px);
@@ -245,7 +247,7 @@ nav.curb-nav {
 
 nav.curb-nav a {
   font-family: "Geist", sans-serif;
-  font-size: 10.5px;
+  font-size: 12.5px;
   font-weight: 800;
   letter-spacing: .06em;
   text-transform: uppercase;
@@ -253,16 +255,19 @@ nav.curb-nav a {
   white-space: nowrap;
   padding-bottom: 3px;
   border-bottom: 2px solid transparent;
-  transition: color .18s var(--ease), border-color .18s var(--ease)
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  transition: color .18s var(--ease), border-color .18s var(--ease), text-shadow .18s var(--ease);
 }
 
 nav.curb-nav a:hover {
-  color: var(--text)
+  color: var(--text);
+  text-shadow: 0 1px 6px rgba(245, 181, 68, 0.3);
 }
 
 nav.curb-nav a.active {
   color: var(--amber-strong);
-  border-bottom-color: var(--amber-strong)
+  border-bottom-color: var(--amber-strong);
+  text-shadow: 0 0 8px rgba(245, 181, 68, 0.4);
 }
 
 .curb-sys {
@@ -286,7 +291,7 @@ nav.curb-nav a.active {
 .page {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 0 28px 70px
+  padding: calc(var(--head-h, 68px) + 28px) 28px 70px;
 }
 
 .page-wide {
@@ -941,7 +946,7 @@ body[data-page="assistant"] .page {
   flex-direction: column;
   flex: 1;
   height: auto;
-  padding-top: 0;
+  padding-top: calc(var(--head-h, 68px) + 20px);
   padding-bottom: 0;
   box-sizing: border-box;
 }
@@ -1864,6 +1869,7 @@ body[data-page="map"] {
   background: linear-gradient(180deg, rgba(230, 223, 211, .97), rgba(230, 223, 211, .88))
 }
 
+<<<<<<< HEAD
 /* ---------- mobile metrics bar (map page) ---------- */
 .metrics-bar {
   display: none;
@@ -1929,6 +1935,18 @@ body[data-page="map"] {
     align-items: center;
     justify-content: center;
   }
+=======
+[data-theme="light"] nav.curb-nav a {
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.6);
+}
+
+[data-theme="light"] nav.curb-nav a:hover {
+  text-shadow: 0 1px 4px rgba(179, 113, 0, 0.25);
+}
+
+[data-theme="light"] nav.curb-nav a.active {
+  text-shadow: 0 0 6px rgba(179, 113, 0, 0.3);
+>>>>>>> b38331b8e853ff193ec0ba17e367274d20cc2859
 }
 
 /* map-page floating header */

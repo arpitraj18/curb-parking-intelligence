@@ -12,7 +12,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="assets/curb.css?v=36">
+  <link rel="stylesheet" href="assets/curb.css?v=57">
 </head>
 
 <body data-page="assistant">
@@ -165,7 +165,10 @@
         if (!noScroll) window.scrollTo(0, document.body.scrollHeight);
         return d;
       }
-      function go(rank) { document.body.classList.remove("curb-ready"); setTimeout(function () { location.href = "map.html?focus=" + rank; }, 200); }
+      function go(rank) {
+        var h = (window.CURB && window.CURB.hotspots || []).filter(function (x) { return x.rank === +rank; })[0];
+        if (h) { X.detail(h); } else { document.body.classList.remove("curb-ready"); setTimeout(function () { location.href = "map.html?focus=" + rank; }, 200); }
+      }
 
       // normalise either schema (full hotspot OR compact API row) into one shape
       function norm(h) {
