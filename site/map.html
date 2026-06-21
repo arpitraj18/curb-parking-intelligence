@@ -13,7 +13,7 @@
     href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-  <link rel="stylesheet" href="assets/curb.css?v=38">
+  <link rel="stylesheet" href="assets/curb.css?v=57">
   <style>
     body[data-page="map"] {
       overflow: hidden
@@ -366,7 +366,7 @@
       };
       var TILE_OPTS = { subdomains: "abcd", maxZoom: 20, attribution: "© OpenStreetMap © CARTO" };
 
-      var map = L.map("map", { zoomControl: true, renderer: L.svg() }).setView([12.97, 77.59], 11.4);
+      var map = L.map("map", { zoomControl: true, preferCanvas: true }).setView([12.97, 77.59], 11.4);
       var initTheme = (localStorage.getItem("curb-theme") || "dark");
       var tileLayer = L.tileLayer(TILES[initTheme], TILE_OPTS).addTo(map);
 
@@ -434,7 +434,7 @@
         Object.values(markers).forEach(function (m) { if (m._path) m._path.setAttribute("stroke-width", "1.5"); });
         var mk = markers[h.rank];
         if (mk) {
-          if (fly) map.flyTo([h.lat, h.lon], Math.max(map.getZoom(), 15), { duration: .6 }); mk.openPopup();
+          if (fly) map.flyTo([h.lat, h.lon], Math.max(map.getZoom(), 15), { duration: .3, easeLinearity: 0.5 }); mk.openPopup();
           if (mk._path) mk._path.setAttribute("stroke-width", "4");
         }
         document.querySelectorAll("#topList .tl-row").forEach(function (r) { r.style.background = (+r.dataset.rank === h.rank) ? "rgba(245,181,68,.12)" : ""; });

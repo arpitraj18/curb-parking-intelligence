@@ -112,8 +112,15 @@
       var h = document.querySelector("header.curb-head");
       if (h) document.documentElement.style.setProperty("--head-h", h.offsetHeight + "px");
     }
-    setH();
-    window.addEventListener("resize", setH);
+    var headEl = document.querySelector("header.curb-head");
+    if (headEl) {
+      if (window.ResizeObserver) {
+        new ResizeObserver(setH).observe(headEl);
+      } else {
+        setH();
+        window.addEventListener("resize", setH);
+      }
+    }
 
     // smooth fade between pages
     document.querySelectorAll("nav.curb-nav a").forEach(function (a) {

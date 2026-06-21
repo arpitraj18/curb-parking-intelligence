@@ -13,7 +13,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="assets/curb.css?v=36">
+  <link rel="stylesheet" href="assets/curb.css?v=57">
   <style>
     html:has(body[data-page="command"]) {
       overflow: hidden;
@@ -35,7 +35,7 @@
       flex-direction: column;
       max-width: 1380px;
       margin: 0 auto;
-      padding: 12px 28px 12px;
+      padding: calc(var(--head-h, 68px) + 28px) 28px 8px;
       min-height: 0;
     }
 
@@ -43,14 +43,52 @@
       flex: none
     }
 
-    .cc .eyebrow {
-      margin-bottom: 5px;
-      font-size: 9px
+    .db-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin: 0 0 16px;
+      padding: 0;
     }
 
-    .cc .page-title {
-      font-size: 23px;
-      margin: 0 0 13px
+    .data-banner {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 9.5px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--dim);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .data-banner .db-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--amber-strong);
+      flex: none
+    }
+
+    .funnel-btn {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 10px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--amber);
+      background: transparent;
+      border: 1px solid var(--amber-strong);
+      border-radius: 9999px;
+      padding: 5px 13px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background .16s var(--ease)
+    }
+
+    .funnel-btn:hover {
+      background: rgba(245, 181, 68, .12)
     }
 
     .cc .tiles {
@@ -169,12 +207,12 @@
     }
 
     .cc .panel {
-      padding: 10px 12px;
+      padding: 6px 12px;
     }
 
     .cc .barrow {
       font-size: 10px;
-      margin: 2px 0;
+      margin: 1px 0;
       display: grid;
       grid-template-columns: 120px 1fr 40px;
       align-items: center;
@@ -216,7 +254,11 @@
 
   <div class="cc">
     <div class="cc-top">
-
+      <div class="db-row">
+        <div class="data-banner"><span class="db-dot"></span>Analysis window · ~150 days of historical enforcement data
+          · diagnostic, not a live feed</div>
+        <button class="funnel-btn" id="funnelBtn">See the 13,782 &rarr; 1 narrowing</button>
+      </div>
       <div class="tiles" id="tiles"></div>
     </div>
 
@@ -236,11 +278,11 @@
         <p class="col-note">Distribution across the ranked priority hotspots.</p>
         <div class="cc-scroll" style="mask-image: none; -webkit-mask-image: none; padding-right: 0; padding-bottom: 0;">
           <div class="panel">
-            <p class="eyebrow" style="margin-bottom:3px">By root cause</p>
+            <p class="eyebrow" style="margin-bottom:2px">By root cause</p>
             <div id="causeBars"></div>
-            <p class="eyebrow" style="margin-top:8px; margin-bottom:3px">By persistence</p>
+            <p class="eyebrow" style="margin-top:5px; margin-bottom:2px">By persistence</p>
             <div id="tierBars"></div>
-            <p class="eyebrow" style="margin-top:8px; margin-bottom:3px">By trend</p>
+            <p class="eyebrow" style="margin-top:5px; margin-bottom:2px">By trend</p>
             <div id="trendBars"></div>
           </div>
         </div>
@@ -254,10 +296,7 @@
   <script>
     (function () {
       var D = window.CURB, X = window.CURBX;
-      function go(h) {
-        document.body.classList.remove("curb-ready");
-        setTimeout(function () { location.href = "map.html?focus=" + h.rank; }, 200);
-      }
+      function go(h) { X.detail(h); }
 
       var cov50 = (D.agg.coverage.filter(function (c) { return c.n === 50; })[0] || {}).pct;
       var tiles = [
@@ -268,11 +307,16 @@
       ];
       document.getElementById("tiles").innerHTML = tiles.map(function (t) {
         return '<div class="tile' + (t.accent ? ' accent' : '') + '"' + (t.accent ? ' style="--cc: var(--amber)"' : '') + '>' +
-               '<span class="material-symbols-outlined tile-bg-icon">' + t.ic + '</span>' +
-               '<div class="k">' + t.k + '</div>' +
-               '<div class="v">' + t.v + '</div>' +
-               '</div>';
+          '<span class="material-symbols-outlined tile-bg-icon">' + t.ic + '</span>' +
+          '<div class="k">' + t.k + '</div>' +
+          '<div class="v">' + t.v + '</div>' +
+          '</div>';
       }).join("");
+
+      // narrowing funnel: the button and the high-conviction tile both open it
+      document.getElementById("funnelBtn").onclick = function () { X.funnel(); };
+      var accentTile = document.querySelector(".tile.accent");
+      if (accentTile) { accentTile.style.cursor = "pointer"; accentTile.onclick = function () { X.funnel(); }; }
 
       var hc = D.hotspots.filter(function (h) { return h.high_conviction; });
       var wl = document.getElementById("watchlist");
