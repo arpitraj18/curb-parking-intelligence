@@ -317,6 +317,8 @@
 <body data-page="map">
   <div id="curb-header"></div>
 
+  <div class="metrics-bar" id="metricsBar"></div>
+
   <div class="map-stage">
     <div id="map"></div>
   </div>
@@ -390,12 +392,15 @@
 
       // metrics (real)
       var cov50 = (D.agg.coverage.filter(function (c) { return c.n === 50; })[0] || {}).pct;
-      document.getElementById("metrics").innerHTML = [
+      var metricsHtml = [
         { k: "Hotspots ranked", v: D.meta.hotspot_count.toLocaleString() },
         { k: "Chronic standing posts", v: D.agg.chronic },
         { k: "Top-50 impact coverage", v: cov50 + '<span class="u">%</span>' },
         { k: "High-conviction spots", v: D.meta.high_conviction, amber: true }
       ].map(function (m) { return '<div class="metric"><div class="mk">' + m.k + '</div><div class="mv' + (m.amber ? ' amber' : '') + '">' + m.v + '</div></div>'; }).join("");
+      document.getElementById("metrics").innerHTML = metricsHtml;
+      document.getElementById("metricsBar").innerHTML =
+        '<div class="mb-inner">' + metricsHtml + '<span class="mb-label">Live Metrics</span></div>';
 
       // cause chips
       function renderChips() {
