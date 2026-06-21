@@ -370,7 +370,7 @@
       var TILE_OPTS = { subdomains: "abcd", maxZoom: 20, attribution: "© OpenStreetMap © CARTO" };
 
       var map = L.map("map", { zoomControl: true, preferCanvas: true }).setView([12.97, 77.59], 11.4);
-      var initTheme = (localStorage.getItem("curb-theme") || "dark");
+      var initTheme = (sessionStorage.getItem("curb-theme") || "dark");
       var tileLayer = L.tileLayer(TILES[initTheme], TILE_OPTS).addTo(map);
 
       // Swap tile layer when the global theme changes

@@ -14,7 +14,7 @@
   var STORAGE_KEY = "curb-theme";
 
   function currentTheme() {
-    return localStorage.getItem(STORAGE_KEY) || "dark";
+    return sessionStorage.getItem(STORAGE_KEY) || "dark";
   }
 
   function applyTheme(theme) {
@@ -30,7 +30,7 @@
 
   function toggleTheme() {
     var next = currentTheme() === "dark" ? "light" : "dark";
-    localStorage.setItem(STORAGE_KEY, next);
+    sessionStorage.setItem(STORAGE_KEY, next);
     applyTheme(next);
   }
 
