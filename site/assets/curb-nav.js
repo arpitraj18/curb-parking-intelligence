@@ -76,6 +76,7 @@
       "</div>" +
       '<nav class="curb-nav">' + links + "</nav>" +
       '<div class="curb-sys">' +
+      '<span class="material-symbols-outlined hamburger" id="hamburger">menu</span>' +
       '<span class="material-symbols-outlined theme-toggle" id="themeToggle" title="' +
       (theme === "dark" ? "Switch to light mode" : "Switch to dark mode") + '">' +
       (theme === "dark" ? "light_mode" : "dark_mode") +
@@ -129,6 +130,61 @@
         e.preventDefault();
         document.body.classList.remove("curb-ready");
         setTimeout(function () { window.location.href = a.getAttribute("href"); }, 220);
+      });
+    });
+
+    // ---- mobile nav ----
+    if (!document.getElementById("mobileNav")) {
+      var mobileNav = document.createElement("div");
+      mobileNav.className = "mobile-nav";
+      mobileNav.id = "mobileNav";
+      mobileNav.innerHTML =
+        '<div class="mobile-nav-panel">' +
+        '<div class="mobile-nav-header">' +
+        '<span class="curb-logo" style="font-size:20px;line-height:1">C<span>U</span>RB</span>' +
+        '<span class="material-symbols-outlined mobile-close" id="closeNav">close</span>' +
+        "</div>" +
+        '<div class="mobile-nav-links">' +
+        NAV.map(function (n) {
+          return '<a href="' + n.href + '" data-nav="' + n.key + '" class="' + (n.key === page ? "active" : "") + '">' +
+            n.label + "</a>";
+        }).join("") +
+        "</div>" +
+        "</div>";
+      document.body.appendChild(mobileNav);
+    }
+
+    var hamburger = document.getElementById("hamburger");
+    var mobileNavEl = document.getElementById("mobileNav");
+    var closeNav = document.getElementById("closeNav");
+
+    function openMobileNav() {
+      mobileNavEl.classList.add("open");
+      document.body.classList.add("nav-open");
+    }
+
+    function closeMobileNav() {
+      mobileNavEl.classList.remove("open");
+      document.body.classList.remove("nav-open");
+    }
+
+    if (hamburger) hamburger.addEventListener("click", openMobileNav);
+    if (closeNav) closeNav.addEventListener("click", closeMobileNav);
+
+    // close on backdrop click
+    if (mobileNavEl) {
+      mobileNavEl.addEventListener("click", function (e) {
+        if (e.target === this) closeMobileNav();
+      });
+    }
+
+    // mobile nav link clicks — close nav then navigate with fade
+    document.querySelectorAll("#mobileNav .mobile-nav-links a").forEach(function (a) {
+      a.addEventListener("click", function (e) {
+        e.preventDefault();
+        closeMobileNav();
+        document.body.classList.remove("curb-ready");
+        setTimeout(function () { window.location.href = a.getAttribute("href"); }, 250);
       });
     });
   }
