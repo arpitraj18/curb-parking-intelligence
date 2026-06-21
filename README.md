@@ -14,7 +14,7 @@
 [![Assistant](https://img.shields.io/badge/Assistant-Gemini%20(grounded)-B08AF0?style=flat-square&labelColor=14100A)](#)
 [![Deploy](https://img.shields.io/badge/Deploy-Vercel-ECE1D4?style=flat-square&labelColor=14100A)](https://curb-parking-intelligence.vercel.app)
 
-**[🔗 Live demo](https://curb-parking-intelligence.vercel.app)** · **[🎞️ Demo video](https://YOUR-VIDEO-URL)** · **[📊 Pitch deck](docs/CURB_Ppt.pptx)** · **[🧾 Methodology](https://curb-parking-intelligence.vercel.app/methodology.html)**
+**[🔗 Live demo](https://curb-parking-intelligence.vercel.app)** · **[🎞️ Demo video](https://youtu.be/hxzj0ZNhiNA)** · **[📊 Pitch deck](docs/CURB_Ppt.pptx)** · **[🧾 Methodology](https://curb-parking-intelligence.vercel.app/methodology.html)**
 
 </div>
 
